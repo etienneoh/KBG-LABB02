@@ -3,6 +3,7 @@ import Repository from '../models/repository.js';
 import Controller from './Controller.js';
 import path from 'path';
 import fs from 'fs';
+import { isNull } from 'util';
 
 export default class MathsController extends Controller {
     constructor(HttpContext) {
@@ -23,8 +24,8 @@ export default class MathsController extends Controller {
                 let para = this.HttpContext.path.params
                 switch (para.op) {
                     case ' ':
-                        if (!isNaN(para.x) && !isNaN(para.y) && !("n" in para)) {
-                            para.value = Number(para.x) + Number(para.y);
+                        if (!isNaN(para.x) && !isNaN(para.y) && Object.keys(para).length == 3) {
+                            para.value = (parseFloat(para.x) + parseFloat(para.y));
                             this.HttpContext.response.JSON(para);
                         } else {
                             para.error = "L'une des valeurs passée en paramètres n'est pas valide.";
@@ -32,8 +33,8 @@ export default class MathsController extends Controller {
                         }
                         break;
                     case '-':
-                        if (!isNaN(para.x) && !isNaN(para.y) && !("n" in para)) {
-                            para.value = Number(para.x) - Number(para.y);
+                        if (!isNaN(para.x) && !isNaN(para.y) && Object.keys(para).length == 3) {
+                            para.value = parseFloat(para.x) - parseFloat(para.y);
                             this.HttpContext.response.JSON(para);
                         } else {
                             para.error = "L'une des valeurs passée en paramètres n'est pas valide.";
@@ -41,8 +42,8 @@ export default class MathsController extends Controller {
                         }
                         break;
                     case '*':
-                        if (!isNaN(para.x) && !isNaN(para.y) && !("n" in para)) {
-                            para.value = Number(para.x) * Number(para.y);
+                        if (!isNaN(para.x) && !isNaN(para.y) && Object.keys(para).length == 3) {
+                            para.value = parseFloat(para.x) * parseFloat(para.y);
                             this.HttpContext.response.JSON(para);
                         } else {
                             para.error = "L'une des valeurs passée en paramètres n'est pas valide.";
@@ -50,8 +51,12 @@ export default class MathsController extends Controller {
                         }
                         break;
                     case '/':
-                        if (!isNaN(para.x) && !isNaN(para.y) && !("n" in para)) {
-                            para.value = Number(para.x) / Number(para.y);
+                        if (!isNaN(para.x) && !isNaN(para.y) && Object.keys(para).length == 3) {
+                            para.value = parseFloat(para.x) / parseFloat(para.y);
+                            if(isNaN(para.value) || para.value == null || para.value == undefined || para.value == Infinity){
+                                para.value = 0;
+                                para.error = "Y doit être supérieur à 0.";
+                            }
                             this.HttpContext.response.JSON(para);
                         } else {
                             para.error = "L'une des valeurs passée en paramètres n'est pas valide.";
@@ -59,8 +64,12 @@ export default class MathsController extends Controller {
                         }
                         break;
                     case '%':
-                        if (!isNaN(para.x) && !isNaN(para.y) && !("n" in para)) {
-                            para.value = Number(para.x) % Number(para.y);
+                        if (!isNaN(para.x) && !isNaN(para.y) && Object.keys(para).length == 3) {
+                            para.value = (parseFloat(para.x) % parseFloat(para.y));
+                            if(isNaN(para.value)){
+                                para.value = 0;
+                                para.error = "Y doit être supérieur à 0.";
+                            }
                             this.HttpContext.response.JSON(para);
                         } else {
                             para.error = "L'une des valeurs passée en paramètres n'est pas valide.";
@@ -68,7 +77,7 @@ export default class MathsController extends Controller {
                         }
                         break;
                     case '!':
-                        if (!isNaN(para.n) && !("x" in para) && !("y" in para)) {
+                        if (!isNaN(para.n) && Object.keys(para).length == 2) {
                             if (para.n >= 0 && Number.isInteger(parseFloat(para.n))) {
                                 para.value = this.factoriser(parseInt(para.n))
                                 this.HttpContext.response.JSON(para);
@@ -82,7 +91,7 @@ export default class MathsController extends Controller {
                         }
                         break;
                     case 'p':
-                        if (!isNaN(para.n) && !("x" in para) && !("y" in para)) {
+                        if (!isNaN(para.n) && Object.keys(para).length == 2) {
                             if (para.n >= 0 && Number.isInteger(parseFloat(para.n))) {
                                 para.value = this.isPrime(parseInt(para.n))
                                 this.HttpContext.response.JSON(para);
@@ -96,7 +105,7 @@ export default class MathsController extends Controller {
                         }
                         break;
                     case 'np':
-                        if (!isNaN(para.n) && !("x" in para) && !("y" in para)) {
+                        if (!isNaN(para.n) && Object.keys(para).length == 2) {
                             if (para.n >= 0 && Number.isInteger(parseFloat(para.n))) {
                                 para.value = this.findNthPrime(parseInt(para.n))
                                 this.HttpContext.response.JSON(para);
